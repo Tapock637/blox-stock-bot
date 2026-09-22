@@ -1,14 +1,16 @@
 from flask import Flask
 import threading
 import time
+import os
 import vk_api
 import requests
 
 app = Flask(__name__)
 
-# --- ВАШИ НАСТРОЙКИ ---
-VK_TOKEN = ""
-MY_USER_ID = 790373000
+# --- НАСТРОЙКИ (токен берётся из переменных окружения) ---
+VK_TOKEN = os.environ.get("VK_TOKEN", "")
+MY_USER_ID = int(os.environ.get("MY_USER_ID", "0"))
+
 STOCK_URL = "https://raw.githubusercontent.com/iamishan877-max/Blox-Fruits-Stock/main/data/stock.json"
 CHECK_INTERVAL = 60
 
