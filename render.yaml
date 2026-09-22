@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: blox-stock-bot
+    runtime: python
+    plan: free
+    region: frankfurt
+    branch: main
+    buildCommand: pip install -r requirements.txt
+    startCommand: python app.py
+    envVars:
+      - key: VK_TOKEN
+        sync: false
+      - key: MY_USER_ID
+        value: "790373000"
