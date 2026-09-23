@@ -14,7 +14,7 @@ app = Flask(__name__)
 VK_TOKEN = os.environ.get("VK_TOKEN", "")
 MY_USER_ID = int(os.environ.get("MY_USER_ID", "0"))
 STOCK_API_KEY = os.environ.get("STOCK_API_KEY", "")
-STOCK_URL = "https://api.parse.bot/scraper/e534d388-6640-4c19-b9b6-b2ba12930793/get_stock"
+STOCK_URL = "https://raw.githubusercontent.com/iamishan877-max/Blox-Fruits-Stock/main/data/stock.json"
 CHECK_INTERVAL = 60
 
 MSK = timezone(timedelta(hours=3))
