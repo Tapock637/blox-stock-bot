@@ -15,7 +15,7 @@ VK_TOKEN = os.environ.get("VK_TOKEN", "")
 MY_USER_ID = int(os.environ.get("MY_USER_ID", "0"))
 STOCK_API_KEY = os.environ.get("STOCK_API_KEY", "")
 STOCK_URL = "https://raw.githubusercontent.com/iamishan877-max/Blox-Fruits-Stock/main/data/stock.json"
-CHECK_INTERVAL = 300
+CHECK_INTERVAL = 60
 
 MSK = timezone(timedelta(hours=3))
 
