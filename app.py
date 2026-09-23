@@ -63,41 +63,44 @@ def format_fruits(fruit_list):
     return names
 
 
-def get_update_times(stock_type, now_msk):
-    base = now_msk.replace(hour=0, minute=0, second=0, microsecond=0)
-    times = []
+def get_update_times(stock_type):
+    """Все возможные времена обновления за одни сутки (только часы)."""
     if stock_type == "normal":
-        hours = [3, 7, 11, 15, 19, 23]
-    else:
-        hours = list(range(1, 24, 2))
-    for day_offset in (-1, 0, 1):
-        day = base + timedelta(days=day_offset)
-        for h in hours:
-            times.append(day.replace(hour=h))
-    return times
-
-
-def format_delta(delta):
-    total_min = int(delta.total_seconds() // 60)
-    hours = total_min // 60
-    minutes = total_min % 60
-    if hours > 0:
-        return f"{hours}ч {minutes}мин"
-    return f"{minutes}мин"
+        return [3, 7, 11, 15, 19, 23]
+    else:  # mirage
+        return list(range(1, 24, 2))  # 1,3,5,...,23
 
 
 def time_info(stock_type):
+    """
+    Возвращает строку вида:
+    🕐 Сток 03:00 → 07:00 МСК
+    """
     try:
         now = datetime.now(MSK)
-        times = get_update_times(stock_type, now)
-        last = max(t for t in times if t <= now)
-        nxt = min(t for t in times if t > now)
-        last_str = last.strftime("%H:%M")
-        next_str = nxt.strftime("%H:%M")
-        until = format_delta(nxt - now)
-        return f"\n\n🕐 Сток от {last_str} МСК\n⏳ До обновления: {until} (в {next_str})"
+        hours = get_update_times(stock_type)
+        current_hour = now.hour
+
+        # Ищем ближайший прошедший час из списка (или предыдущий день)
+        past = [h for h in hours if h <= current_hour]
+        if past:
+            start_hour = max(past)
+            # Конец — следующий час из списка
+            future = [h for h in hours if h > start_hour]
+            if future:
+                end_hour = min(future)
+            else:
+                end_hour = min(hours)  # переход через полночь
+        else:
+            # Сейчас раньше самого первого обновления дня — сток идёт с вчера
+            start_hour = max(hours)
+            end_hour = min(hours)
+
+        start_str = f"{start_hour:02d}:00"
+        end_str = f"{end_hour:02d}:00"
+        return f"\n\n🕐 Сток {start_str} → {end_str} МСК"
     except Exception as e:
-        log(f"[Time] Ошибка расчёта времени: {e}")
+        log(f"[Time] Ошибка: {e}")
         return ""
 
 
@@ -165,7 +168,6 @@ def cleanup_duplicates():
 
 
 def process_iteration(last_normal_set, last_mirage_set):
-    """Один цикл проверки стока. Возвращает обновлённые сеты."""
     data = get_stock()
     if not data:
         return last_normal_set, last_mirage_set
@@ -207,7 +209,6 @@ def process_iteration(last_normal_set, last_mirage_set):
 
 
 def bot_loop():
-    """Основной цикл бота. Никогда не падает — любая ошибка ловится."""
     log("Бот запущен. Слежу за стоком...")
 
     last_normal_text, last_mirage_text = cleanup_duplicates()
@@ -231,7 +232,6 @@ def bot_loop():
 
 
 def run_bot_forever():
-    """Супервизор: если bot_loop упал — перезапускает через 5 сек."""
     while True:
         try:
             bot_loop()
